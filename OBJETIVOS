@@ -1,0 +1,13 @@
+# Explicação do projeto:
+
+Este projeto é um sistema de gerenciamento de partidas de Monopoly usando SQL.  
+Ele permite que jogadores se movimentem pelo tabuleiro, comprem propriedades, paguem aluguel e sigam as regras do jogo de forma automatizada.  
+O banco de dados controla turnos, transações financeiras e posições dos jogadores, garantindo o registro e execução correta das ações dentro da partida.
+
+## Objetivo do projeto de Monopoly NoSQL:
+
+1. Gerenciar partidas de Monopoly de forma automatizada, controlando o progresso dos jogadores, propriedades e transações sem necessidade de intervenção manual.
+
+2. Registrar e acompanhar o histórico de cada jogador, incluindo saldo, propriedades adquiridas e ações realizadas durante a partida.
+
+**13/02/2025**
