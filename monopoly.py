@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-# String de conexão do MongoDB Atlas com a senha fornecida
+# String de conexão do MongoDB Atlas
 MONGO_URI = "mongodb+srv://wendelamorimm:FWSIuAL0DmOF30At@cluster0.poyx2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 def conectar_banco():
