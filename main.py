@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from typing import List, Optional
 import os
 
-# Configure a string de conexão com seu MongoDB Atlas
+
 MONGO_URI = "mongodb+srv://wendelamorimm:FWSIuAL0DmOF30At@cluster0.poyx2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 client = MongoClient(MONGO_URI)
