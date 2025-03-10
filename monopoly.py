@@ -15,7 +15,7 @@ def conectar_banco():
 def inserir_dados():
     db = conectar_banco()
     
-    # Inserir jogadores (4 usuários) com campo "endereco"
+    # Inserir jogadores (4 usuários) com campo "endereco" e propriedades detalhadas
     jogadores = db.jogadores
     jogadores.insert_many([
         {
@@ -23,7 +23,42 @@ def inserir_dados():
             "nome": "Lucas Verde",
             "saldo": 1500,
             "posicao": 0,
-            "propriedades": ["avenida_atlantica", "copacabana"],
+            "propriedades": [
+                {
+                    "_id": "avenida_atlantica",
+                    "nome": "Avenida Atlântica",
+                    "cor": "azul",
+                    "preco": 400,
+                    "aluguel": {
+                        "base": 50,
+                        "com_1_casa": 200,
+                        "com_2_casas": 600,
+                        "com_3_casas": 1400,
+                        "com_4_casas": 1700,
+                        "hotel": 2000
+                    },
+                    "casas": 2,
+                    "hotel": False,
+                    "endereco": "Avenida Atlântica, 1000"
+                },
+                {
+                    "_id": "copacabana",
+                    "nome": "Copacabana",
+                    "cor": "azul",
+                    "preco": 350,
+                    "aluguel": {
+                        "base": 35,
+                        "com_1_casa": 175,
+                        "com_2_casas": 500,
+                        "com_3_casas": 1100,
+                        "com_4_casas": 1300,
+                        "hotel": 1500
+                    },
+                    "casas": 1,
+                    "hotel": False,
+                    "endereco": "Rua Copacabana, 2000"
+                }
+            ],
             "preso": False,
             "cartoes_sair_da_prisao": 1,
             "endereco": "Rua das Flores, 123"
@@ -57,49 +92,6 @@ def inserir_dados():
             "preso": False,
             "cartoes_sair_da_prisao": 0,
             "endereco": "Av. Brasil, 101"
-        }
-    ])
-    
-    # Inserir propriedades do tabuleiro com campo "endereco"
-    tabuleiro = db.tabuleiro
-    tabuleiro.insert_many([
-        {
-            "_id": "avenida_atlantica",
-            "tipo": "propriedade",
-            "nome": "Avenida Atlântica",
-            "cor": "azul",
-            "preco": 400,
-            "aluguel": {
-                "base": 50,
-                "com_1_casa": 200,
-                "com_2_casas": 600,
-                "com_3_casas": 1400,
-                "com_4_casas": 1700,
-                "hotel": 2000
-            },
-            "dono": "player_1",
-            "casas": 2,
-            "hotel": False,
-            "endereco": "Avenida Atlântica, 1000"
-        },
-        {
-            "_id": "copacabana",
-            "tipo": "propriedade",
-            "nome": "Copacabana",
-            "cor": "azul",
-            "preco": 350,
-            "aluguel": {
-                "base": 35,
-                "com_1_casa": 175,
-                "com_2_casas": 500,
-                "com_3_casas": 1100,
-                "com_4_casas": 1300,
-                "hotel": 1500
-            },
-            "dono": "player_1",
-            "casas": 1,
-            "hotel": False,
-            "endereco": "Rua Copacabana, 2000"
         }
     ])
     
