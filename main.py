@@ -1,104 +1,91 @@
-from fastapi import FastAPI, HTTPException, Body
-from pymongo import MongoClient
-from pydantic import BaseModel
-from bson.objectid import ObjectId
-from typing import List, Optional
 import os
+from fastapi import FastAPI, HTTPException, Body, Depends
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict
+from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId
 
+# Configuração segura do MongoDB
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+DATABASE_NAME = "monopoly"
 
-MONGO_URI = "mongodb+srv://wendelamorimm:FWSIuAL0DmOF30At@cluster0.poyx2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# Conectar ao MongoDB de forma assíncrona
+client = AsyncIOMotorClient(MONGO_URI)
+db = client[DATABASE_NAME]
 
-client = MongoClient(MONGO_URI)
-db = client["monopoly"]
+app = FastAPI(title="API Monopoly", description="API segura para gerenciamento de partidas e jogadores")
 
-app = FastAPI(title="API Monopoly", description="API para gerenciar partidas e histórico de jogadores")
-
-# Função auxiliar para converter _id do MongoDB em string
-def convert_id(doc):
-    doc["id"] = str(doc["_id"])
-    del doc["_id"]
+# Função auxiliar para converter documentos MongoDB
+async def convert_id(doc):
+    if doc and "_id" in doc:
+        doc["id"] = str(doc.pop("_id"))
     return doc
 
-# Modelos Pydantic para validação dos dados
+# Modelos Pydantic para validação
+class Action(BaseModel):
+    action: str = Field(..., min_length=3)
+    details: Optional[Dict] = {}
 
 class Game(BaseModel):
-    players: List[str]
+    players: List[str] = Field(..., min_items=2, max_items=6)  # Limite de jogadores
     turn: Optional[str] = None
-    status: Optional[str] = "in_progress"  # Exemplos: "in_progress", "finished"
-    history: Optional[List[dict]] = []      # Histórico de ações na partida
-
-class Action(BaseModel):
-    action: str
-    details: Optional[dict] = {}
+    status: Optional[str] = Field("in_progress", regex="^(in_progress|finished)$")
+    history: Optional[List[Action]] = []
 
 class PlayerHistory(BaseModel):
-    player_id: str
-    balance: float
+    player_id: str = Field(..., min_length=3)
+    balance: float = Field(..., ge=0)
     properties: List[str] = []
-    actions: List[dict] = []
+    actions: List[Action] = []
 
-# ----- Endpoints para Gerenciar Partidas -----
+# ----- Endpoints -----
 
-# Cria uma nova partida
 @app.post("/games/", response_model=dict)
-def create_game(game: Game):
+async def create_game(game: Game):
     game_dict = game.dict()
-    result = db.games.insert_one(game_dict)
+    result = await db.games.insert_one(game_dict)
     game_dict["_id"] = result.inserted_id
-    return convert_id(game_dict)
+    return await convert_id(game_dict)
 
-# Consulta os dados de uma partida específica
 @app.get("/games/{game_id}", response_model=dict)
-def get_game(game_id: str):
-    game = db.games.find_one({"_id": ObjectId(game_id)})
+async def get_game(game_id: str):
+    game = await db.games.find_one({"_id": ObjectId(game_id)})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
-    return convert_id(game)
+    return await convert_id(game)
 
-# Atualiza dados da partida (ex: progresso dos jogadores, turno, status)
 @app.patch("/games/{game_id}", response_model=dict)
-def update_game(game_id: str, update: dict = Body(...)):
-    result = db.games.update_one({"_id": ObjectId(game_id)}, {"$set": update})
+async def update_game(game_id: str, update: Dict = Body(...)):
+    allowed_fields = {"players", "turn", "status", "history"}
+    update = {k: v for k, v in update.items() if k in allowed_fields}  # Evita injeção
+    result = await db.games.update_one({"_id": ObjectId(game_id)}, {"$set": update})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Game not found")
-    game = db.games.find_one({"_id": ObjectId(game_id)})
-    return convert_id(game)
+    return await get_game(game_id)
 
-# Adiciona uma ação ao histórico da partida
 @app.post("/games/{game_id}/actions", response_model=dict)
-def add_game_action(game_id: str, action: Action):
-    result = db.games.update_one(
-        {"_id": ObjectId(game_id)},
-        {"$push": {"history": action.dict()}}
-    )
+async def add_game_action(game_id: str, action: Action):
+    result = await db.games.update_one({"_id": ObjectId(game_id)}, {"$push": {"history": action.dict()}})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Game not found")
-    game = db.games.find_one({"_id": ObjectId(game_id)})
-    return convert_id(game)
+    return await get_game(game_id)
 
-# ----- Endpoints para Gerenciar o Histórico dos Jogadores -----
-
-# Consulta o histórico de um jogador
 @app.get("/players/{player_id}/history", response_model=dict)
-def get_player_history(player_id: str):
-    history = db.player_history.find_one({"player_id": player_id})
+async def get_player_history(player_id: str):
+    history = await db.player_history.find_one({"player_id": player_id})
     if not history:
         raise HTTPException(status_code=404, detail="Player history not found")
-    return convert_id(history)
+    return await convert_id(history)
 
-# Registra ou atualiza uma ação no histórico do jogador
 @app.post("/players/{player_id}/history", response_model=dict)
-def update_player_history(player_id: str, action: Action):
-    # Atualiza (ou cria se não existir) o histórico do jogador, adicionando a ação
-    result = db.player_history.update_one(
+async def update_player_history(player_id: str, action: Action):
+    result = await db.player_history.update_one(
         {"player_id": player_id},
         {"$push": {"actions": action.dict()}},
         upsert=True
     )
-    history = db.player_history.find_one({"player_id": player_id})
-    return convert_id(history)
+    return await get_player_history(player_id)
 
-# Executa a aplicação se o arquivo for executado diretamente
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
