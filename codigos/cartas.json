@@ -15,16 +15,16 @@
     "descricao": "Avance até a Avenida Atlântica.",
     "acao": {
       "tipo": "mover",
-      "destino": "avenida_atlantica"
+      "destino": "atlantic_avenue"
     }
   },
   {
     "_id": "sorte_3",
     "tipo": "sorte",
-    "descricao": "Avance até o Boulevard Copacabana. Se passar pelo ponto de partida, receba R$200.",
+    "descricao": "Avance até a Avenida Ventnor. Se passar pelo ponto de partida, receba R$200.",
     "acao": {
       "tipo": "mover",
-      "destino": "copacabana",
+      "destino": "ventnor_avenue",
       "bonus": 200
     }
   },
@@ -101,10 +101,10 @@
   {
     "_id": "reves_4",
     "tipo": "reves",
-    "descricao": "Avance até a Praça da Sé. Se passar pelo ponto de partida, receba R$200.",
+    "descricao": "Avance até a Praça St. James. Se passar pelo ponto de partida, receba R$200.",
     "acao": {
       "tipo": "mover",
-      "destino": "praca_da_se",
+      "destino": "st_james_place",
       "bonus": 200
     }
   },
