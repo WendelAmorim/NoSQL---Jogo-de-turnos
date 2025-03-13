@@ -33,7 +33,7 @@ class Game(BaseModel):
     status: Optional[str] = Field("in_progress", regex="^(in_progress|finished)$")
     history: Optional[List[Action]] = []
 
-# Rolar dados
+# Rolar dados e movimentar jogador
 @app.get("/roll/{player_id}")
 async def roll_dice(player_id: str):
     roll = random.randint(1, 6) + random.randint(1, 6)
@@ -41,8 +41,22 @@ async def roll_dice(player_id: str):
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     
-    new_position = (player["posicao"] + roll) % 40  # Tabuleiro de 40 casas
+    old_position = player["posicao"]
+    new_position = (old_position + roll) % 40  # Tabuleiro de 40 casas
+    
+    # Se passar pelo ponto de partida
+    if old_position > new_position:
+        await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": 200}})
+    
     await db.jogadores.update_one({"_id": player_id}, {"$set": {"posicao": new_position}})
+    
+    # Verificar ações da casa
+    endereco = await db.enderecos.find_one({"_id": str(new_position)})
+    if endereco:
+        if endereco["tipo"] == "especial" and endereco["_id"] == "go_to_jail":
+            await db.jogadores.update_one({"_id": player_id}, {"$set": {"posicao": 10, "preso": True}})
+            return {"player_id": player_id, "dice_roll": roll, "new_position": 10, "message": "Sent to jail"}
+    
     return {"player_id": player_id, "dice_roll": roll, "new_position": new_position}
 
 # Comprar propriedade
@@ -76,7 +90,7 @@ async def pay_rent(player_id: str, property_id: str):
     if "owner" not in property_ or not property_["owner"] or property_["owner"] == player_id:
         raise HTTPException(status_code=400, detail="No rent to pay")
     
-    rent = property_["aluguel"]["base"]  # Pode ser expandido para calcular com casas e hotéis
+    rent = property_["aluguel"]
     owner = await db.jogadores.find_one({"_id": property_["owner"]})
     
     if player["saldo"] < rent:
@@ -85,39 +99,6 @@ async def pay_rent(player_id: str, property_id: str):
     await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": -rent}})
     await db.jogadores.update_one({"_id": owner["_id"]}, {"$inc": {"saldo": rent}})
     return {"message": "Rent paid", "payer": player_id, "owner": owner["_id"], "amount": rent}
-
-# Sair da prisão
-@app.post("/jail/{player_id}")
-async def leave_jail(player_id: str, pay: bool = False):
-    player = await db.jogadores.find_one({"_id": player_id})
-    
-    if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
-    
-    if not player.get("preso", False):
-        return {"message": "Player is not in jail"}
-    
-    if pay:
-        if player["saldo"] < 50:
-            raise HTTPException(status_code=400, detail="Insufficient funds")
-        await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": -50}, "$set": {"preso": False}})
-        return {"message": "Player paid fine and left jail"}
-    
-    return {"message": "Player must roll doubles or use 'Get Out of Jail Free' card"}
-
-# Verificar falência e eliminar jogador
-@app.post("/check_bankruptcy/{player_id}")
-async def check_bankruptcy(player_id: str):
-    player = await db.jogadores.find_one({"_id": player_id})
-    
-    if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
-    
-    if player["saldo"] >= 0:
-        return {"message": "Player is not bankrupt"}
-    
-    await db.jogadores.delete_one({"_id": player_id})
-    return {"message": "Player removed due to bankruptcy"}
 
 if __name__ == "__main__":
     import uvicorn
