@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI, HTTPException, Body, Depends
+import random
+from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -13,7 +14,7 @@ DATABASE_NAME = "monopoly"
 client = AsyncIOMotorClient(MONGO_URI)
 db = client[DATABASE_NAME]
 
-app = FastAPI(title="API Monopoly", description="API segura para gerenciamento de partidas e jogadores")
+app = FastAPI(title="API Monopoly", description="API para gerenciamento de partidas e jogadores")
 
 # Função auxiliar para converter documentos MongoDB
 async def convert_id(doc):
@@ -27,64 +28,96 @@ class Action(BaseModel):
     details: Optional[Dict] = {}
 
 class Game(BaseModel):
-    players: List[str] = Field(..., min_items=2, max_items=6)  # Limite de jogadores
+    players: List[str] = Field(..., min_items=2, max_items=6)
     turn: Optional[str] = None
     status: Optional[str] = Field("in_progress", regex="^(in_progress|finished)$")
     history: Optional[List[Action]] = []
 
-class PlayerHistory(BaseModel):
-    player_id: str = Field(..., min_length=3)
-    balance: float = Field(..., ge=0)
-    properties: List[str] = []
-    actions: List[Action] = []
+# Rolar dados
+@app.get("/roll/{player_id}")
+async def roll_dice(player_id: str):
+    roll = random.randint(1, 6) + random.randint(1, 6)
+    player = await db.players.find_one({"_id": player_id})
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    new_position = (player["posicao"] + roll) % 40  # Tabuleiro de 40 casas
+    await db.players.update_one({"_id": player_id}, {"$set": {"posicao": new_position}})
+    return {"player_id": player_id, "dice_roll": roll, "new_position": new_position}
 
-# ----- Endpoints -----
+# Comprar propriedade
+@app.post("/buy/{player_id}/{property_id}")
+async def buy_property(player_id: str, property_id: str):
+    player = await db.players.find_one({"_id": player_id})
+    property_ = await db.properties.find_one({"_id": property_id})
+    
+    if not player or not property_:
+        raise HTTPException(status_code=404, detail="Player or property not found")
+    
+    if "owner" in property_ and property_["owner"]:
+        raise HTTPException(status_code=400, detail="Property already owned")
+    
+    if player["saldo"] < property_["preco"]:
+        raise HTTPException(status_code=400, detail="Insufficient funds")
+    
+    await db.players.update_one({"_id": player_id}, {"$inc": {"saldo": -property_["preco"]}})
+    await db.properties.update_one({"_id": property_id}, {"$set": {"owner": player_id}})
+    return {"message": "Property purchased", "player_id": player_id, "property_id": property_id}
 
-@app.post("/games/", response_model=dict)
-async def create_game(game: Game):
-    game_dict = game.dict()
-    result = await db.games.insert_one(game_dict)
-    game_dict["_id"] = result.inserted_id
-    return await convert_id(game_dict)
+# Pagar aluguel
+@app.post("/pay_rent/{player_id}/{property_id}")
+async def pay_rent(player_id: str, property_id: str):
+    player = await db.players.find_one({"_id": player_id})
+    property_ = await db.properties.find_one({"_id": property_id})
+    
+    if not player or not property_:
+        raise HTTPException(status_code=404, detail="Player or property not found")
+    
+    if "owner" not in property_ or not property_["owner"] or property_["owner"] == player_id:
+        raise HTTPException(status_code=400, detail="No rent to pay")
+    
+    rent = property_["aluguel"]["base"]  # Pode ser expandido para calcular com casas e hotéis
+    owner = await db.players.find_one({"_id": property_["owner"]})
+    
+    if player["saldo"] < rent:
+        raise HTTPException(status_code=400, detail="Insufficient funds")
+    
+    await db.players.update_one({"_id": player_id}, {"$inc": {"saldo": -rent}})
+    await db.players.update_one({"_id": owner["_id"]}, {"$inc": {"saldo": rent}})
+    return {"message": "Rent paid", "payer": player_id, "owner": owner["_id"], "amount": rent}
 
-@app.get("/games/{game_id}", response_model=dict)
-async def get_game(game_id: str):
-    game = await db.games.find_one({"_id": ObjectId(game_id)})
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found")
-    return await convert_id(game)
+# Sair da prisão
+@app.post("/jail/{player_id}")
+async def leave_jail(player_id: str, pay: bool = False):
+    player = await db.players.find_one({"_id": player_id})
+    
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    if not player.get("preso", False):
+        return {"message": "Player is not in jail"}
+    
+    if pay:
+        if player["saldo"] < 50:
+            raise HTTPException(status_code=400, detail="Insufficient funds")
+        await db.players.update_one({"_id": player_id}, {"$inc": {"saldo": -50}, "$set": {"preso": False}})
+        return {"message": "Player paid fine and left jail"}
+    
+    return {"message": "Player must roll doubles or use 'Get Out of Jail Free' card"}
 
-@app.patch("/games/{game_id}", response_model=dict)
-async def update_game(game_id: str, update: Dict = Body(...)):
-    allowed_fields = {"players", "turn", "status", "history"}
-    update = {k: v for k, v in update.items() if k in allowed_fields}  # Evita injeção
-    result = await db.games.update_one({"_id": ObjectId(game_id)}, {"$set": update})
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Game not found")
-    return await get_game(game_id)
-
-@app.post("/games/{game_id}/actions", response_model=dict)
-async def add_game_action(game_id: str, action: Action):
-    result = await db.games.update_one({"_id": ObjectId(game_id)}, {"$push": {"history": action.dict()}})
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Game not found")
-    return await get_game(game_id)
-
-@app.get("/players/{player_id}/history", response_model=dict)
-async def get_player_history(player_id: str):
-    history = await db.player_history.find_one({"player_id": player_id})
-    if not history:
-        raise HTTPException(status_code=404, detail="Player history not found")
-    return await convert_id(history)
-
-@app.post("/players/{player_id}/history", response_model=dict)
-async def update_player_history(player_id: str, action: Action):
-    result = await db.player_history.update_one(
-        {"player_id": player_id},
-        {"$push": {"actions": action.dict()}},
-        upsert=True
-    )
-    return await get_player_history(player_id)
+# Verificar falência e eliminar jogador
+@app.post("/check_bankruptcy/{player_id}")
+async def check_bankruptcy(player_id: str):
+    player = await db.players.find_one({"_id": player_id})
+    
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    if player["saldo"] >= 0:
+        return {"message": "Player is not bankrupt"}
+    
+    await db.players.delete_one({"_id": player_id})
+    return {"message": "Player removed due to bankruptcy"}
 
 if __name__ == "__main__":
     import uvicorn
