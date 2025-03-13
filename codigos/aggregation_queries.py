@@ -6,12 +6,28 @@
       "saldo": 1500,
       "posicao": 0,
       "propriedades": [
-        {"_id": "avenida_atlantica", "casas": 2, "hotel": false},
-        {"_id": "copacabana", "casas": 1, "hotel": false}
+        {"_id": "prop_avenida_atlantica", "casas": 2, "hotel": false},
+        {"_id": "prop_copacabana", "casas": 1, "hotel": false}
       ],
       "preso": false,
       "cartoes_sair_da_prisao": 1,
       "endereco": "Rua das Flores, 123"
+    }
+  ],
+  "propriedades": [
+    {
+      "_id": "prop_avenida_atlantica",
+      "nome": "Avenida Atlântica",
+      "preco": 350,
+      "aluguel": 50,
+      "owner": "player_1"
+    },
+    {
+      "_id": "prop_copacabana",
+      "nome": "Copacabana",
+      "preco": 300,
+      "aluguel": 40,
+      "owner": "player_1"
     }
   ],
   "partidas": [
@@ -35,8 +51,16 @@
     {
       "player_id": "player_1",
       "actions": [
-        {"action": "comprar", "details": {"propriedade": "copacabana", "valor": 350}},
-        {"action": "pagar", "details": {"destinatario": "player_3", "valor": 50}}
+        {
+          "action": "comprar",
+          "details": {"propriedade": "prop_copacabana", "valor": 350},
+          "timestamp": "2025-03-13T14:30:00Z"
+        },
+        {
+          "action": "pagar",
+          "details": {"destinatario": "player_3", "valor": 50},
+          "timestamp": "2025-03-13T15:00:00Z"
+        }
       ]
     }
   ],
@@ -57,12 +81,14 @@
     ],
     "listar_propriedades_jogador": [
       {"$match": {"_id": "player_1"}},
-      {"$lookup": {
-        "from": "propriedades",
-        "localField": "propriedades._id",
-        "foreignField": "_id",
-        "as": "detalhes_propriedades"
-      }},
+      {
+        "$lookup": {
+          "from": "propriedades",
+          "localField": "propriedades._id",
+          "foreignField": "_id",
+          "as": "detalhes_propriedades"
+        }
+      },
       {"$project": {"nome": 1, "detalhes_propriedades": 1}}
     ]
   }
