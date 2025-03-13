@@ -1,3 +1,4 @@
+*MONOPOLY EM NOSQL** 
 Este projeto de Monopoly é uma solução completa que integra conceitos de NoSQL e desenvolvimento de APIs para simular e gerenciar partidas de um jogo de tabuleiro clássico. Ele foi desenvolvido como trabalho da disciplina Banco de Dados NoSQL do curso de Gestão da Informação da UFU.
 
 # Principais Aspectos do Projeto
