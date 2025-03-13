@@ -1,0 +1,44 @@
+{
+  "_id": "partida_1",
+  "jogadores": [
+    {
+      "_id": "player_1",
+      "nome": "Lucas Verde",
+      "saldo": 1500,
+      "posicao": 0,
+      "preso": false,
+      "cartoes_sair_da_prisao": 1,
+      "cartas_sorte_reves": ["sorte_1", "reves_2"],
+      "propriedades": [
+        {
+          "nome": "Avenida Atlântica",
+          "cor": "azul",
+          "preco": 400,
+          "aluguel": {
+            "base": 50,
+            "com_1_casa": 200,
+            "com_2_casas": 600,
+            "com_3_casas": 1400,
+            "com_4_casas": 1700,
+            "hotel": 2000
+          },
+          "casas": 2,
+          "hotel": false
+        }
+      ]
+    },
+    {
+      "_id": "player_2",
+      "nome": "João Silva",
+      "saldo": 1500,
+      "posicao": 0,
+      "preso": false,
+      "cartoes_sair_da_prisao": 0,
+      "cartas_sorte_reves": ["sorte_2"],
+      "propriedades": []
+    }
+  ],
+  "turno_atual": "player_2",
+  "status": "em_andamento",
+  "vencedor": null
+}
