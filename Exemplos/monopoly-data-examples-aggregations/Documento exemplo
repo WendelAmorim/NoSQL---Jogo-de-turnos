@@ -1,0 +1,43 @@
+{
+  "jogadores": [
+    {
+      "_id": "player_1",
+      "nome": "Lucas Verde",
+      "saldo": 1500,
+      "posicao": 0,
+      "propriedades": [
+        {"_id": "avenida_atlantica", "casas": 2, "hotel": false},
+        {"_id": "copacabana", "casas": 1, "hotel": false}
+      ],
+      "preso": false,
+      "cartoes_sair_da_prisao": 1,
+      "endereco": "Rua das Flores, 123"
+    }
+  ],
+  "partidas": [
+    {
+      "_id": "partida_1",
+      "jogadores": ["player_1", "player_2", "player_3", "player_4"],
+      "turno_atual": "player_2",
+      "status": "em_andamento",
+      "vencedor": null
+    }
+  ],
+  "cartas": [
+    {
+      "_id": "sorte_1",
+      "tipo": "sorte",
+      "descricao": "Avance para o ponto de partida e receba R$200",
+      "acao": {"tipo": "mover", "destino": 0, "bonus": 200}
+    }
+  ],
+  "historico_jogadores": [
+    {
+      "player_id": "player_1",
+      "actions": [
+        {"action": "comprar", "details": {"propriedade": "copacabana", "valor": 350}},
+        {"action": "pagar", "details": {"destinatario": "player_3", "valor": 50}}
+      ]
+    }
+  ]
+}
