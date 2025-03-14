@@ -33,6 +33,50 @@ class Game(BaseModel):
     status: Optional[str] = Field("in_progress", regex="^(in_progress|finished)$")
     history: Optional[List[Action]] = []
 
+# Função para gerar documentos de exemplo
+async def generate_sample_data():
+    jogadores = [
+        {"_id": "1", "nome": "Alice", "saldo": 1500, "posicao": 0, "preso": False},
+        {"_id": "2", "nome": "Bob", "saldo": 1500, "posicao": 0, "preso": False}
+    ]
+    propriedades = [
+        {"_id": "101", "nome": "Avenida Paulista", "preco": 200, "aluguel": 20, "owner": None},
+        {"_id": "102", "nome": "Copacabana", "preco": 250, "aluguel": 25, "owner": None}
+    ]
+    enderecos = [
+        {"_id": "0", "tipo": "start"},
+        {"_id": "30", "tipo": "especial", "descricao": "go_to_jail"}
+    ]
+
+    await db.jogadores.delete_many({})
+    await db.propriedades.delete_many({})
+    await db.enderecos.delete_many({})
+
+    await db.jogadores.insert_many(jogadores)
+    await db.propriedades.insert_many(propriedades)
+    await db.enderecos.insert_many(enderecos)
+
+# Aggregation Pipeline para verificar saldo total dos jogadores
+async def total_balance():
+    pipeline = [
+        {"$group": {"_id": None, "total": {"$sum": "$saldo"}}}
+    ]
+    result = await db.jogadores.aggregate(pipeline).to_list(length=None)
+    return result[0]["total"] if result else 0
+
+# Aggregation Pipeline para listar propriedades e seus donos
+async def properties_with_owners():
+    pipeline = [
+        {"$lookup": {
+            "from": "jogadores",
+            "localField": "owner",
+            "foreignField": "_id",
+            "as": "proprietario"
+        }},
+        {"$unwind": {"path": "$proprietario", "preserveNullAndEmptyArrays": True}}
+    ]
+    return await db.propriedades.aggregate(pipeline).to_list(length=None)
+
 # Rolar dados e movimentar jogador
 @app.get("/roll/{player_id}")
 async def roll_dice(player_id: str):
@@ -49,13 +93,6 @@ async def roll_dice(player_id: str):
         await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": 200}})
     
     await db.jogadores.update_one({"_id": player_id}, {"$set": {"posicao": new_position}})
-    
-    # Verificar ações da casa
-    endereco = await db.enderecos.find_one({"_id": str(new_position)})
-    if endereco:
-        if endereco["tipo"] == "especial" and endereco["_id"] == "go_to_jail":
-            await db.jogadores.update_one({"_id": player_id}, {"$set": {"posicao": 10, "preso": True}})
-            return {"player_id": player_id, "dice_roll": roll, "new_position": 10, "message": "Sent to jail"}
     
     return {"player_id": player_id, "dice_roll": roll, "new_position": new_position}
 
@@ -78,27 +115,10 @@ async def buy_property(player_id: str, property_id: str):
     await db.propriedades.update_one({"_id": property_id}, {"$set": {"owner": player_id}})
     return {"message": "Property purchased", "player_id": player_id, "property_id": property_id}
 
-# Pagar aluguel
-@app.post("/pay_rent/{player_id}/{property_id}")
-async def pay_rent(player_id: str, property_id: str):
-    player = await db.jogadores.find_one({"_id": player_id})
-    property_ = await db.propriedades.find_one({"_id": property_id})
-    
-    if not player or not property_:
-        raise HTTPException(status_code=404, detail="Player or property not found")
-    
-    if "owner" not in property_ or not property_["owner"] or property_["owner"] == player_id:
-        raise HTTPException(status_code=400, detail="No rent to pay")
-    
-    rent = property_["aluguel"]
-    owner = await db.jogadores.find_one({"_id": property_["owner"]})
-    
-    if player["saldo"] < rent:
-        raise HTTPException(status_code=400, detail="Insufficient funds")
-    
-    await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": -rent}})
-    await db.jogadores.update_one({"_id": owner["_id"]}, {"$inc": {"saldo": rent}})
-    return {"message": "Rent paid", "payer": player_id, "owner": owner["_id"], "amount": rent}
+# Inicializar o banco com dados de exemplo
+@app.on_event("startup")
+async def startup_event():
+    await generate_sample_data()
 
 if __name__ == "__main__":
     import uvicorn
