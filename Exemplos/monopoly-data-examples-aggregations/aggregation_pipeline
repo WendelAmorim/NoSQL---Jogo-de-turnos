@@ -1,3 +1,5 @@
+#Aqui é um exemplo de como está sendo usado aggregation pipline no codigo main.py 
+
 #Somar o saldo total dos jogadores 
 
 async def total_balance():
