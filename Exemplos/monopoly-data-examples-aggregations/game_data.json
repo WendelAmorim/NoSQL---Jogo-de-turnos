@@ -1,43 +1,103 @@
 {
-  "jogadores": [
+  "game_id": "game123",
+  "status": "in_progress",
+  "players": [
     {
-      "_id": "player_1",
-      "nome": "Lucas Verde",
-      "saldo": 1500,
-      "posicao": 0,
-      "propriedades": [
-        {"_id": "avenida_atlantica", "casas": 2, "hotel": false},
-        {"_id": "copacabana", "casas": 1, "hotel": false}
+      "player_id": "player1",
+      "name": "Jogador 1",
+      "balance": 1500,
+      "properties": [
+        {
+          "property_id": "property1",
+          "name": "Avenida João Naves de Ávila",
+          "price": 400,
+          "rent": 50,
+          "houses": 2
+        },
+        {
+          "property_id": "property2",
+          "name": "Rua Dona Zulmira",
+          "price": 350,
+          "rent": 35,
+          "houses": 1
+        }
       ],
-      "preso": false,
-      "cartoes_sair_da_prisao": 1,
-      "endereco": "Rua das Flores, 123"
+      "position": 7,
+      "turns_taken": 3,
+      "status": "active"
+    },
+    {
+      "player_id": "player2",
+      "name": "Jogador 2",
+      "balance": 1400,
+      "properties": [
+        {
+          "property_id": "property3",
+          "name": "Avenida Getúlio Vargas",
+          "price": 60,
+          "rent": 10,
+          "houses": 0
+        },
+        {
+          "property_id": "property4",
+          "name": "Rua Machado de Assis",
+          "price": 60,
+          "rent": 10,
+          "houses": 0
+        }
+      ],
+      "position": 15,
+      "turns_taken": 3,
+      "status": "active"
+    },
+    {
+      "player_id": "player3",
+      "name": "Jogador 3",
+      "balance": 1300,
+      "properties": [
+        {
+          "property_id": "property5",
+          "name": "Avenida Joana D’Arc",
+          "price": 280,
+          "rent": 22,
+          "houses": 1
+        }
+      ],
+      "position": 22,
+      "turns_taken": 3,
+      "status": "active"
+    },
+    {
+      "player_id": "player4",
+      "name": "Jogador 4",
+      "balance": 1200,
+      "properties": [
+        {
+          "property_id": "property6",
+          "name": "Rua Paraná",
+          "price": 200,
+          "rent": 25,
+          "houses": 0
+        }
+      ],
+      "position": 30,
+      "turns_taken": 3,
+      "status": "active"
     }
   ],
-  "partidas": [
-    {
-      "_id": "partida_1",
-      "jogadores": ["player_1", "player_2", "player_3", "player_4"],
-      "turno_atual": "player_2",
-      "status": "em_andamento",
-      "vencedor": null
-    }
+  "current_turn": "player1",
+  "board": [
+    { "id": "property1", "name": "Avenida João Naves de Ávila", "price": 400, "rent": 50 },
+    { "id": "property2", "name": "Rua Dona Zulmira", "price": 350, "rent": 35 },
+    { "id": "property3", "name": "Avenida Getúlio Vargas", "price": 60, "rent": 10 },
+    { "id": "property4", "name": "Rua Machado de Assis", "price": 60, "rent": 10 },
+    { "id": "property5", "name": "Avenida Joana D’Arc", "price": 280, "rent": 22 },
+    { "id": "property6", "name": "Rua Paraná", "price": 200, "rent": 25 }
   ],
-  "cartas": [
-    {
-      "_id": "sorte_1",
-      "tipo": "sorte",
-      "descricao": "Avance para o ponto de partida e receba R$200",
-      "acao": {"tipo": "mover", "destino": 0, "bonus": 200}
-    }
-  ],
-  "historico_jogadores": [
-    {
-      "player_id": "player_1",
-      "actions": [
-        {"action": "comprar", "details": {"propriedade": "copacabana", "valor": 350}},
-        {"action": "pagar", "details": {"destinatario": "player_3", "valor": 50}}
-      ]
-    }
+  "turns": [
+    { "player_id": "player1", "action": "rolled_dice", "roll": 7, "new_position": 7, "properties_bought": ["property1"] },
+    { "player_id": "player2", "action": "rolled_dice", "roll": 8, "new_position": 15, "properties_bought": ["property3"] },
+    { "player_id": "player3", "action": "rolled_dice", "roll": 5, "new_position": 22, "properties_bought": ["property5"] },
+    { "player_id": "player4", "action": "rolled_dice", "roll": 6, "new_position": 30, "properties_bought": ["property6"] }
   ]
 }
