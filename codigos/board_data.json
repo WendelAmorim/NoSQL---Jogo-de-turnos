@@ -1,36 +1,272 @@
 [
-  {"_id": "go", "nome": "Ponto de Partida", "tipo": "especial", "endereco": "Praça Central, 0"},
-  {"_id": "mediterranean_avenue", "nome": "Avenida Mediterrânea", "tipo": "propriedade", "cor": "marrom", "preco": 60, "aluguel": 2, "endereco": "Rua Mediterrânea, 1"},
-  {"_id": "community_chest_1", "nome": "Cofre Comunitário", "tipo": "especial", "endereco": "Rua do Tesouro, 2"},
-  {"_id": "baltic_avenue", "nome": "Avenida Báltica", "tipo": "propriedade", "cor": "marrom", "preco": 60, "aluguel": 4, "endereco": "Rua Báltica, 3"},
-  {"_id": "income_tax", "nome": "Imposto sobre Renda", "tipo": "imposto", "valor": 200, "endereco": "Avenida dos Tributos, 4"},
-  {"_id": "reading_railroad", "nome": "Estrada de Ferro Reading", "tipo": "ferrovia", "preco": 200, "endereco": "Terminal Reading, 5"},
-  {"_id": "oriental_avenue", "nome": "Avenida Oriental", "tipo": "propriedade", "cor": "azul_claro", "preco": 100, "aluguel": 6, "endereco": "Rua Oriental, 6"},
-  {"_id": "chance_1", "nome": "Sorte", "tipo": "especial", "endereco": "Praça da Fortuna, 7"},
-  {"_id": "vermont_avenue", "nome": "Avenida Vermont", "tipo": "propriedade", "cor": "azul_claro", "preco": 100, "aluguel": 6, "endereco": "Rua Vermont, 8"},
-  {"_id": "connecticut_avenue", "nome": "Avenida Connecticut", "tipo": "propriedade", "cor": "azul_claro", "preco": 120, "aluguel": 8, "endereco": "Rua Connecticut, 9"},
-  {"_id": "jail", "nome": "Prisão (Apenas Visitante)", "tipo": "especial", "endereco": "Delegacia Central, 10"},
-  {"_id": "st_charles_place", "nome": "Praça St. Charles", "tipo": "propriedade", "cor": "rosa", "preco": 140, "aluguel": 10, "endereco": "Rua St. Charles, 11"},
-  {"_id": "electric_company", "nome": "Companhia de Energia", "tipo": "empresa", "preco": 150, "endereco": "Central Elétrica, 12"},
-  {"_id": "states_avenue", "nome": "Avenida dos Estados", "tipo": "propriedade", "cor": "rosa", "preco": 140, "aluguel": 10, "endereco": "Rua dos Estados, 13"},
-  {"_id": "virginia_avenue", "nome": "Avenida Virginia", "tipo": "propriedade", "cor": "rosa", "preco": 160, "aluguel": 12, "endereco": "Rua Virginia, 14"},
-  {"_id": "pennsylvania_railroad", "nome": "Estrada de Ferro Pennsylvania", "tipo": "ferrovia", "preco": 200, "endereco": "Terminal Pennsylvania, 15"},
-  {"_id": "st_james_place", "nome": "Praça St. James", "tipo": "propriedade", "cor": "laranja", "preco": 180, "aluguel": 14, "endereco": "Rua St. James, 16"},
-  {"_id": "community_chest_2", "nome": "Cofre Comunitário", "tipo": "especial", "endereco": "Rua do Tesouro, 17"},
-  {"_id": "tennessee_avenue", "nome": "Avenida Tennessee", "tipo": "propriedade", "cor": "laranja", "preco": 180, "aluguel": 14, "endereco": "Rua Tennessee, 18"},
-  {"_id": "new_york_avenue", "nome": "Avenida Nova York", "tipo": "propriedade", "cor": "laranja", "preco": 200, "aluguel": 16, "endereco": "Rua Nova York, 19"},
-  {"_id": "free_parking", "nome": "Estacionamento Grátis", "tipo": "especial", "endereco": "Avenida Livre, 20"},
-  {"_id": "kentucky_avenue", "nome": "Avenida Kentucky", "tipo": "propriedade", "cor": "vermelho", "preco": 220, "aluguel": 18, "endereco": "Rua Kentucky, 21"},
-  {"_id": "chance_2", "nome": "Sorte", "tipo": "especial", "endereco": "Praça da Fortuna, 22"},
-  {"_id": "indiana_avenue", "nome": "Avenida Indiana", "tipo": "propriedade", "cor": "vermelho", "preco": 220, "aluguel": 18, "endereco": "Rua Indiana, 23"},
-  {"_id": "illinois_avenue", "nome": "Avenida Illinois", "tipo": "propriedade", "cor": "vermelho", "preco": 240, "aluguel": 20, "endereco": "Rua Illinois, 24"},
-  {"_id": "b_o_railroad", "nome": "Estrada de Ferro B&O", "tipo": "ferrovia", "preco": 200, "endereco": "Terminal B&O, 25"},
-  {"_id": "atlantic_avenue", "nome": "Avenida Atlântica", "tipo": "propriedade", "cor": "amarelo", "preco": 260, "aluguel": 22, "endereco": "Rua Atlântica, 26"},
-  {"_id": "ventnor_avenue", "nome": "Avenida Ventnor", "tipo": "propriedade", "cor": "amarelo", "preco": 260, "aluguel": 22, "endereco": "Rua Ventnor, 27"},
-  {"_id": "water_works", "nome": "Companhia de Água", "tipo": "empresa", "preco": 150, "endereco": "Estação de Tratamento, 28"},
-  {"_id": "marvin_gardens", "nome": "Jardins Marvin", "tipo": "propriedade", "cor": "amarelo", "preco": 280, "aluguel": 24, "endereco": "Alameda Marvin, 29"},
-  {"_id": "go_to_jail", "nome": "Vá para a Prisão", "tipo": "especial", "endereco": "Delegacia Central, 30"},
-  {"_id": "pacific_avenue", "nome": "Avenida Pacífica", "tipo": "propriedade", "cor": "verde", "preco": 300, "aluguel": 26, "endereco": "Rua Pacífica, 31"},
-  {"_id": "north_carolina_avenue", "nome": "Avenida Carolina do Norte", "tipo": "propriedade", "cor": "verde", "preco": 320, "aluguel": 28, "endereco": "Rua Carolina do Norte, 32"},
-  {"_id": "pennsylvania_avenue", "nome": "Avenida Pennsylvania", "tipo": "propriedade", "cor": "verde", "preco": 320, "aluguel": 28, "endereco": "Rua Pennsylvania, 33"}
+  {
+    "_id": "rua_joao_naves_de_avila",
+    "nome": "Rua João Naves de Ávila",
+    "tipo": "especial",
+    "endereco": "Rua João Naves de Ávila, 0"
+  },
+  {
+    "_id": "avenida_getulio_vargas",
+    "nome": "Avenida Getúlio Vargas",
+    "tipo": "propriedade",
+    "cor": "marrom",
+    "preco": 60,
+    "aluguel": 2,
+    "endereco": "Avenida Getúlio Vargas, 1"
+  },
+  {
+    "_id": "rua_afonso_pena",
+    "nome": "Rua Afonso Pena",
+    "tipo": "especial",
+    "endereco": "Rua Afonso Pena, 2"
+  },
+  {
+    "_id": "rua_14_bis",
+    "nome": "Rua 14 Bis",
+    "tipo": "propriedade",
+    "cor": "marrom",
+    "preco": 60,
+    "aluguel": 4,
+    "endereco": "Rua 14 Bis, 3"
+  },
+  {
+    "_id": "avenida_dom_pedro_i",
+    "nome": "Avenida Dom Pedro I",
+    "tipo": "imposto",
+    "valor": 200,
+    "endereco": "Avenida Dom Pedro I, 4"
+  },
+  {
+    "_id": "rua_barao_de_lavras",
+    "nome": "Rua Barão de Lavras",
+    "tipo": "ferrovia",
+    "preco": 200,
+    "endereco": "Rua Barão de Lavras, 5"
+  },
+  {
+    "_id": "rua_santa_tereza",
+    "nome": "Rua Santa Tereza",
+    "tipo": "propriedade",
+    "cor": "azul_claro",
+    "preco": 100,
+    "aluguel": 6,
+    "endereco": "Rua Santa Tereza, 6"
+  },
+  {
+    "_id": "rua_coronel_jose_dias",
+    "nome": "Rua Coronel José Dias",
+    "tipo": "especial",
+    "endereco": "Rua Coronel José Dias, 7"
+  },
+  {
+    "_id": "avenida_antonio_prado",
+    "nome": "Avenida Antônio Prado",
+    "tipo": "propriedade",
+    "cor": "azul_claro",
+    "preco": 100,
+    "aluguel": 6,
+    "endereco": "Avenida Antônio Prado, 8"
+  },
+  {
+    "_id": "rua_benedito_calixto",
+    "nome": "Rua Benedito Calixto",
+    "tipo": "propriedade",
+    "cor": "azul_claro",
+    "preco": 120,
+    "aluguel": 8,
+    "endereco": "Rua Benedito Calixto, 9"
+  },
+  {
+    "_id": "rua_dos_andradas",
+    "nome": "Rua dos Andradas",
+    "tipo": "especial",
+    "endereco": "Rua dos Andradas, 10"
+  },
+  {
+    "_id": "avenida_uberlandia",
+    "nome": "Avenida Uberlândia",
+    "tipo": "propriedade",
+    "cor": "rosa",
+    "preco": 140,
+    "aluguel": 10,
+    "endereco": "Avenida Uberlândia, 11"
+  },
+  {
+    "_id": "rua_sao_paulo",
+    "nome": "Rua São Paulo",
+    "tipo": "empresa",
+    "preco": 150,
+    "endereco": "Rua São Paulo, 12"
+  },
+  {
+    "_id": "rua_dos_estudantes",
+    "nome": "Rua dos Estudantes",
+    "tipo": "propriedade",
+    "cor": "rosa",
+    "preco": 140,
+    "aluguel": 10,
+    "endereco": "Rua dos Estudantes, 13"
+  },
+  {
+    "_id": "rua_27_de_outubro",
+    "nome": "Rua 27 de Outubro",
+    "tipo": "propriedade",
+    "cor": "rosa",
+    "preco": 160,
+    "aluguel": 12,
+    "endereco": "Rua 27 de Outubro, 14"
+  },
+  {
+    "_id": "rua_bahia",
+    "nome": "Rua Bahia",
+    "tipo": "ferrovia",
+    "preco": 200,
+    "endereco": "Rua Bahia, 15"
+  },
+  {
+    "_id": "avenida_dos_contornos",
+    "nome": "Avenida dos Contornos",
+    "tipo": "propriedade",
+    "cor": "laranja",
+    "preco": 180,
+    "aluguel": 14,
+    "endereco": "Avenida dos Contornos, 16"
+  },
+  {
+    "_id": "rua_tapajos",
+    "nome": "Rua Tapajós",
+    "tipo": "especial",
+    "endereco": "Rua Tapajós, 17"
+  },
+  {
+    "_id": "rua_amazonas",
+    "nome": "Rua Amazonas",
+    "tipo": "propriedade",
+    "cor": "laranja",
+    "preco": 180,
+    "aluguel": 14,
+    "endereco": "Rua Amazonas, 18"
+  },
+  {
+    "_id": "rua_itamar_franco",
+    "nome": "Rua Itamar Franco",
+    "tipo": "propriedade",
+    "cor": "laranja",
+    "preco": 200,
+    "aluguel": 16,
+    "endereco": "Rua Itamar Franco, 19"
+  },
+  {
+    "_id": "avenida_ipiranga",
+    "nome": "Avenida Ipiranga",
+    "tipo": "especial",
+    "endereco": "Avenida Ipiranga, 20"
+  },
+  {
+    "_id": "rua_pernambuco",
+    "nome": "Rua Pernambuco",
+    "tipo": "propriedade",
+    "cor": "vermelho",
+    "preco": 220,
+    "aluguel": 18,
+    "endereco": "Rua Pernambuco, 21"
+  },
+  {
+    "_id": "rua_sergipe",
+    "nome": "Rua Sergipe",
+    "tipo": "especial",
+    "endereco": "Rua Sergipe, 22"
+  },
+  {
+    "_id": "rua_mato_grosso",
+    "nome": "Rua Mato Grosso",
+    "tipo": "propriedade",
+    "cor": "vermelho",
+    "preco": 220,
+    "aluguel": 18,
+    "endereco": "Rua Mato Grosso, 23"
+  },
+  {
+    "_id": "avenida_goias",
+    "nome": "Avenida Goiás",
+    "tipo": "propriedade",
+    "cor": "vermelho",
+    "preco": 240,
+    "aluguel": 20,
+    "endereco": "Avenida Goiás, 24"
+  },
+  {
+    "_id": "rua_minas_gerais",
+    "nome": "Rua Minas Gerais",
+    "tipo": "ferrovia",
+    "preco": 200,
+    "endereco": "Rua Minas Gerais, 25"
+  },
+  {
+    "_id": "rua_sao_sebastiao",
+    "nome": "Rua São Sebastião",
+    "tipo": "propriedade",
+    "cor": "amarelo",
+    "preco": 260,
+    "aluguel": 22,
+    "endereco": "Rua São Sebastião, 26"
+  },
+  {
+    "_id": "rua_paraiba",
+    "nome": "Rua Paraíba",
+    "tipo": "propriedade",
+    "cor": "amarelo",
+    "preco": 260,
+    "aluguel": 22,
+    "endereco": "Rua Paraíba, 27"
+  },
+  {
+    "_id": "rua_do_comercio",
+    "nome": "Rua do Comércio",
+    "tipo": "empresa",
+    "preco": 150,
+    "endereco": "Rua do Comércio, 28"
+  },
+  {
+    "_id": "avenida_contorno",
+    "nome": "Avenida Contorno",
+    "tipo": "propriedade",
+    "cor": "amarelo",
+    "preco": 280,
+    "aluguel": 24,
+    "endereco": "Avenida Contorno, 29"
+  },
+  {
+    "_id": "rua_da_paz",
+    "nome": "Rua da Paz",
+    "tipo": "especial",
+    "endereco": "Rua da Paz, 30"
+  },
+  {
+    "_id": "rua_do_sol",
+    "nome": "Rua do Sol",
+    "tipo": "propriedade",
+    "cor": "verde",
+    "preco": 300,
+    "aluguel": 26,
+    "endereco": "Rua do Sol, 31"
+  },
+  {
+    "_id": "rua_das_flores",
+    "nome": "Rua das Flores",
+    "tipo": "propriedade",
+    "cor": "verde",
+    "preco": 320,
+    "aluguel": 28,
+    "endereco": "Rua das Flores, 32"
+  },
+  {
+    "_id": "avenida_central",
+    "nome": "Avenida Central",
+    "tipo": "propriedade",
+    "cor": "verde",
+    "preco": 320,
+    "aluguel": 28,
+    "endereco": "Avenida Central, 33"
+  }
 ]
