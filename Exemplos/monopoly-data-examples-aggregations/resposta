@@ -1,0 +1,39 @@
+# Com o pipeline properties_with_owners_pipeline essa é a reposta:
+[
+  {
+    "property_id": "property1",
+    "property_name": "Avenida João Naves de Ávila",
+    "owner_name": "Jogador 1",
+    "owner_balance": 1500
+  },
+  {
+    "property_id": "property2",
+    "property_name": "Rua Dona Zulmira",
+    "owner_name": "Jogador 1",
+    "owner_balance": 1500
+  },
+  {
+    "property_id": "property3",
+    "property_name": "Avenida Getúlio Vargas",
+    "owner_name": "Jogador 2",
+    "owner_balance": 1400
+  },
+  {
+    "property_id": "property4",
+    "property_name": "Rua Machado de Assis",
+    "owner_name": "Jogador 2",
+    "owner_balance": 1400
+  },
+  {
+    "property_id": "property5",
+    "property_name": "Avenida Joana D’Arc",
+    "owner_name": "Jogador 3",
+    "owner_balance": 1300
+  },
+  {
+    "property_id": "property6",
+    "property_name": "Rua Paraná",
+    "owner_name": "Jogador 4",
+    "owner_balance": 1200
+  }
+]
