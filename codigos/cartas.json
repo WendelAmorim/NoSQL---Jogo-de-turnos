@@ -2,29 +2,29 @@
   {
     "_id": "sorte_1",
     "tipo": "sorte",
-    "descricao": "Avance até o ponto de partida e receba R$200",
+    "descricao": "Avance até a Rua João Naves de Ávila e receba R$200",
     "acao": {
       "tipo": "mover",
-      "destino": 0,
+      "destino": "rua_joao_naves_de_avila",
       "bonus": 200
     }
   },
   {
     "_id": "sorte_2",
     "tipo": "sorte",
-    "descricao": "Avance até a Avenida Atlântica.",
+    "descricao": "Avance até a Rua São Sebastião.",
     "acao": {
       "tipo": "mover",
-      "destino": "atlantic_avenue"
+      "destino": "rua_sao_sebastiao"
     }
   },
   {
     "_id": "sorte_3",
     "tipo": "sorte",
-    "descricao": "Avance até a Avenida Ventnor. Se passar pelo ponto de partida, receba R$200.",
+    "descricao": "Avance até a Rua Paraíba. Se passar pela Rua João Naves de Ávila, receba R$200.",
     "acao": {
       "tipo": "mover",
-      "destino": "ventnor_avenue",
+      "destino": "rua_paraiba",
       "bonus": 200
     }
   },
@@ -66,7 +66,7 @@
   {
     "_id": "sorte_8",
     "tipo": "sorte",
-    "descricao": "Vá para a prisão. Não passe pelo ponto de partida e não receba R$200.",
+    "descricao": "Vá para a prisão. Não passe pela Rua João Naves de Ávila e não receba R$200.",
     "acao": {
       "tipo": "prisao"
     }
@@ -101,10 +101,10 @@
   {
     "_id": "reves_4",
     "tipo": "reves",
-    "descricao": "Avance até a Praça St. James. Se passar pelo ponto de partida, receba R$200.",
+    "descricao": "Avance até a Avenida dos Contornos. Se passar pela Rua João Naves de Ávila, receba R$200.",
     "acao": {
       "tipo": "mover",
-      "destino": "st_james_place",
+      "destino": "avenida_dos_contornos",
       "bonus": 200
     }
   },
@@ -121,10 +121,10 @@
   {
     "_id": "reves_6",
     "tipo": "reves",
-    "descricao": "Avance para o Ponto de Partida e receba R$200.",
+    "descricao": "Avance para a Rua João Naves de Ávila e receba R$200.",
     "acao": {
       "tipo": "mover",
-      "destino": 0,
+      "destino": "rua_joao_naves_de_avila",
       "bonus": 200
     }
   },
@@ -139,7 +139,7 @@
   {
     "_id": "reves_8",
     "tipo": "reves",
-    "descricao": "Vá para a prisão. Não passe pelo ponto de partida e não receba R$200.",
+    "descricao": "Vá para a prisão. Não passe pela Rua João Naves de Ávila e não receba R$200.",
     "acao": {
       "tipo": "prisao"
     }
