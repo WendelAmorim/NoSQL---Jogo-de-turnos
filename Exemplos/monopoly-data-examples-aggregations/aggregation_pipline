@@ -1,0 +1,22 @@
+#Somar o saldo total dos jogadores 
+
+async def total_balance():
+    pipeline = [
+        {"$group": {"_id": None, "total": {"$sum": "$saldo"}}}
+    ]
+    result = await db.jogadores.aggregate(pipeline).to_list(length=None)
+    return result[0]["total"] if result else 0
+
+#Listar propriedades com seus donos
+
+async def properties_with_owners():
+    pipeline = [
+        {"$lookup": {
+            "from": "jogadores",
+            "localField": "owner",
+            "foreignField": "_id",
+            "as": "proprietario"
+        }},
+        {"$unwind": {"path": "$proprietario", "preserveNullAndEmptyArrays": True}}
+    ]
+    return await db.propriedades.aggregate(pipeline).to_list(length=None)
