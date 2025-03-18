@@ -33,30 +33,7 @@ class Game(BaseModel):
     status: Optional[str] = Field("in_progress", regex="^(in_progress|finished)$")
     history: Optional[List[Action]] = []
 
-# Função para gerar documentos de exemplo
-async def generate_sample_data():
-    jogadores = [
-        {"_id": "1", "nome": "Alice", "saldo": 1500, "posicao": 0, "preso": False},
-        {"_id": "2", "nome": "Bob", "saldo": 1500, "posicao": 0, "preso": False}
-    ]
-    propriedades = [
-        {"_id": "101", "nome": "Avenida Paulista", "preco": 200, "aluguel": 20, "owner": None},
-        {"_id": "102", "nome": "Copacabana", "preco": 250, "aluguel": 25, "owner": None}
-    ]
-    enderecos = [
-        {"_id": "0", "tipo": "start"},
-        {"_id": "30", "tipo": "especial", "descricao": "go_to_jail"}
-    ]
-
-    await db.jogadores.delete_many({})
-    await db.propriedades.delete_many({})
-    await db.enderecos.delete_many({})
-
-    await db.jogadores.insert_many(jogadores)
-    await db.propriedades.insert_many(propriedades)
-    await db.enderecos.insert_many(enderecos)
-
-# Aggregation Pipeline para verificar saldo total dos jogadores
+# Aggregation Pipeline para calcular o total de saldo dos jogadores
 async def total_balance():
     pipeline = [
         {"$group": {"_id": None, "total": {"$sum": "$saldo"}}}
@@ -115,10 +92,18 @@ async def buy_property(player_id: str, property_id: str):
     await db.propriedades.update_one({"_id": property_id}, {"$set": {"owner": player_id}})
     return {"message": "Property purchased", "player_id": player_id, "property_id": property_id}
 
-# Inicializar o banco com dados de exemplo
+# Exibir o total de saldo de todos os jogadores
+@app.get("/total_balance")
+async def get_total_balance():
+    total = await total_balance()
+    return {"total_balance": total}
+
+# Inicializar índices eficientes
 @app.on_event("startup")
 async def startup_event():
-    await generate_sample_data()
+    # Criação de índices para otimização
+    await db.jogadores.create_index([("nome", 1)], unique=True)  # Índice único para nome dos jogadores
+    await db.propriedades.create_index([("owner", 1)])  # Índice no campo "owner" para otimizar o lookup
 
 if __name__ == "__main__":
     import uvicorn
