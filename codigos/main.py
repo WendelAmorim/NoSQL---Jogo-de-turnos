@@ -1,10 +1,9 @@
 import os
-import random
-from fastapi import FastAPI, HTTPException, Body
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+import redis
+from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
+from pydantic import BaseModel
+from typing import List
 
 # Configuração segura do MongoDB
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
@@ -14,97 +13,98 @@ DATABASE_NAME = "monopoly"
 client = AsyncIOMotorClient(MONGO_URI)
 db = client[DATABASE_NAME]
 
+# Conectar ao Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+
+# Criar API FastAPI
 app = FastAPI(title="API Monopoly", description="API para gerenciamento de partidas e jogadores")
 
-# Função auxiliar para converter documentos MongoDB
-async def convert_id(doc):
-    if doc and "_id" in doc:
-        doc["id"] = str(doc.pop("_id"))
-    return doc
+# Modelos de Dados
+class Jogador(BaseModel):
+    nome: str
+    saldo: int
 
-# Modelos Pydantic para validação
-class Action(BaseModel):
-    action: str = Field(..., min_length=3)
-    details: Optional[Dict] = {}
+class Propriedade(BaseModel):
+    nome: str
+    preco: int
+    aluguel: int
+    cor: str
 
-class Game(BaseModel):
-    players: List[str] = Field(..., min_items=2, max_items=6)
-    turn: Optional[str] = None
-    status: Optional[str] = Field("in_progress", regex="^(in_progress|finished)$")
-    history: Optional[List[Action]] = []
+# 1. Cache de jogadores no Redis (hash)
+async def cache_jogador(jogador_id: str, jogador: Jogador):
+    redis_client.hset(f"jogador:{jogador_id}", mapping=jogador.dict())
 
-# Aggregation Pipeline para calcular o total de saldo dos jogadores
-async def total_balance():
-    pipeline = [
-        {"$group": {"_id": None, "total": {"$sum": "$saldo"}}}
-    ]
-    result = await db.jogadores.aggregate(pipeline).to_list(length=None)
-    return result[0]["total"] if result else 0
+async def get_jogador_cache(jogador_id: str):
+    dados = redis_client.hgetall(f"jogador:{jogador_id}")
+    if dados:
+        return Jogador(**dados)
+    return None
 
-# Aggregation Pipeline para listar propriedades e seus donos
-async def properties_with_owners():
-    pipeline = [
-        {"$lookup": {
-            "from": "jogadores",
-            "localField": "owner",
-            "foreignField": "_id",
-            "as": "proprietario"
-        }},
-        {"$unwind": {"path": "$proprietario", "preserveNullAndEmptyArrays": True}}
-    ]
-    return await db.propriedades.aggregate(pipeline).to_list(length=None)
+@app.post("/jogador/")
+async def criar_jogador(jogador: Jogador):
+    jogador_id = jogador.nome.lower().replace(" ", "_")
 
-# Rolar dados e movimentar jogador
-@app.get("/roll/{player_id}")
-async def roll_dice(player_id: str):
-    roll = random.randint(1, 6) + random.randint(1, 6)
-    player = await db.jogadores.find_one({"_id": player_id})
-    if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
+    # Salvar no MongoDB
+    await db.jogadores.insert_one(jogador.dict())
+
+    # Salvar no Redis
+    await cache_jogador(jogador_id, jogador)
     
-    old_position = player["posicao"]
-    new_position = (old_position + roll) % 40  # Tabuleiro de 40 casas
-    
-    # Se passar pelo ponto de partida
-    if old_position > new_position:
-        await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": 200}})
-    
-    await db.jogadores.update_one({"_id": player_id}, {"$set": {"posicao": new_position}})
-    
-    return {"player_id": player_id, "dice_roll": roll, "new_position": new_position}
+    return {"mensagem": "Jogador criado com sucesso!"}
 
-# Comprar propriedade
-@app.post("/buy/{player_id}/{property_id}")
-async def buy_property(player_id: str, property_id: str):
-    player = await db.jogadores.find_one({"_id": player_id})
-    property_ = await db.propriedades.find_one({"_id": property_id})
-    
-    if not player or not property_:
-        raise HTTPException(status_code=404, detail="Player or property not found")
-    
-    if "owner" in property_ and property_["owner"]:
-        raise HTTPException(status_code=400, detail="Property already owned")
-    
-    if player["saldo"] < property_["preco"]:
-        raise HTTPException(status_code=400, detail="Insufficient funds")
-    
-    await db.jogadores.update_one({"_id": player_id}, {"$inc": {"saldo": -property_["preco"]}})
-    await db.propriedades.update_one({"_id": property_id}, {"$set": {"owner": player_id}})
-    return {"message": "Property purchased", "player_id": player_id, "property_id": property_id}
+@app.get("/jogador/{jogador_id}")
+async def obter_jogador(jogador_id: str):
+    jogador = await get_jogador_cache(jogador_id)
+    if jogador:
+        return {"jogador": jogador}
 
-# Exibir o total de saldo de todos os jogadores
-@app.get("/total_balance")
-async def get_total_balance():
-    total = await total_balance()
-    return {"total_balance": total}
+    # Se não estiver no Redis, busca no MongoDB
+    jogador = await db.jogadores.find_one({"nome": jogador_id})
+    if jogador:
+        await cache_jogador(jogador_id, Jogador(**jogador))
+        return {"jogador": jogador}
+    
+    return {"erro": "Jogador não encontrado"}
 
-# Inicializar índices eficientes
-@app.on_event("startup")
-async def startup_event():
-    # Criação de índices para otimização
-    await db.jogadores.create_index([("nome", 1)], unique=True)  # Índice único para nome dos jogadores
-    await db.propriedades.create_index([("owner", 1)])  # Índice no campo "owner" para otimizar o lookup
+# 2. Lista de compras de propriedades (LIST)
+@app.post("/comprar/{jogador_id}/{propriedade}")
+async def comprar_propriedade(jogador_id: str, propriedade: str):
+    redis_client.lpush(f"compras:{jogador_id}", propriedade)
+    return {"mensagem": f"{propriedade} comprada por {jogador_id}"}
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+@app.get("/historico-compras/{jogador_id}")
+async def historico_compras(jogador_id: str):
+    compras = redis_client.lrange(f"compras:{jogador_id}", 0, -1)
+    return {"compras": compras}
+
+# 3. Conjunto de propriedades por jogador (SET)
+@app.post("/adicionar_propriedade/{jogador_id}/{propriedade}")
+async def adicionar_propriedade(jogador_id: str, propriedade: str):
+    redis_client.sadd(f"propriedades:{jogador_id}", propriedade)
+    return {"mensagem": f"Propriedade {propriedade} adicionada ao jogador {jogador_id}"}
+
+@app.get("/propriedades/{jogador_id}")
+async def listar_propriedades(jogador_id: str):
+    propriedades = redis_client.smembers(f"propriedades:{jogador_id}")
+    return {"propriedades": list(propriedades)}
+
+@app.get("/tem_conjunto/{jogador_id}/{cor}")
+async def verificar_conjunto(jogador_id: str, cor: str):
+    propriedades = list(redis_client.smembers(f"propriedades:{jogador_id}"))
+    todas_propriedades = await db.propriedades.find({"cor": cor}).to_list(None)
+    
+    nomes_propriedades = [p["nome"] for p in todas_propriedades]
+    possui_todas = all(prop in propriedades for prop in nomes_propriedades)
+    
+    return {"tem_conjunto": possui_todas}
+
+# 4. Gerenciamento de turnos no Redis
+@app.post("/set_turno/{jogador_id}")
+async def set_turno(jogador_id: str):
+    redis_client.set("turno_atual", jogador_id)
+    return {"mensagem": f"Turno do jogador {jogador_id}"}
+
+@app.get("/turno_atual")
+async def get_turno():
+    turno = redis_client.get("turno_atual")
+    return {"turno_atual": turno}
