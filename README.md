@@ -1,18 +1,52 @@
 # MONOPOLY EM NOSQL
 
-Este projeto de Monopoly é uma solução completa que integra conceitos de NoSQL e desenvolvimento de APIs para simular e gerenciar partidas de um jogo de tabuleiro clássico. Ele foi desenvolvido como trabalho da disciplina Banco de Dados NoSQL do curso de Gestão da Informação da UFU.
+Este projeto de Monopoly é uma solução completa que integra conceitos de NoSQL e desenvolvimento de APIs para simular e gerenciar partidas do clássico jogo de tabuleiro. Ele foi desenvolvido como trabalho da disciplina Banco de Dados NoSQL do curso de Gestão da Informação da UFU.
 
 # Principais Aspectos do Projeto
 **Armazenamento Flexível com MongoDB:**
-Utiliza o MongoDB para armazenar dados de forma flexível, abrangendo informações dos jogadores, propriedades do tabuleiro, cartas de sorte/reves e o histórico de cada partida.
+O MongoDB é utilizado para armazenar dados de forma persistente e estruturada, incluindo:
 
-**API com FastAPI e PyMongo:**
-Uma API foi criada usando FastAPI para expor endpoints que permitem a criação, atualização e consulta de partidas, além do registro de ações e acompanhamento do histórico dos jogadores. O PyMongo é empregado para interagir com o banco de dados MongoDB.
+- Informações dos jogadores
 
-**Gerenciamento Automatizado das Partidas:**
-O sistema gerencia o andamento das partidas, controlando o progresso dos jogadores, realizando transações automáticas (como compra de propriedades e pagamento de aluguéis) e registrando cada ação no histórico do jogo.
+- Propriedades do tabuleiro
 
-**Registro e Acompanhamento do Histórico:**
-Todas as ações dos jogadores, como alterações de saldo, aquisição de propriedades e eventos do jogo, são registradas para permitir um acompanhamento detalhado da evolução de cada partida.
+- Cartas de Sorte/Reves
 
-Em resumo, o projeto representa uma aplicação integrada que une a prática de banco de dados NoSQL com o desenvolvimento de uma API em Python, proporcionando uma base para o gerenciamento completo e automatizado de partidas de Monopoly.
+- Histórico completo das partidas
+
+**Otimização com Redis**
+O Redis foi integrado para melhorar o desempenho e a eficiência do sistema, sendo usado para:
+
+- Cache de jogadores → evita consultas repetitivas ao MongoDB
+
+- Histórico de compras com listas (LIST)
+
+- Gerenciamento de propriedades dos jogadores com conjuntos (SET)
+
+- Controle de turnos utilizando chave-valor (SET/GET)
+
+**API com FastAPI, MongoDB e Redis**
+A API foi desenvolvida com FastAPI, permitindo a criação, atualização e consulta de partidas.
+
+- O MongoDB é acessado via Motor (AsyncIO) para operações assíncronas eficientes.
+
+- O Redis acelera operações frequentes, reduzindo a carga no banco de dados principal.
+
+**Gerenciamento Inteligente das Partidas**
+O sistema automatiza o fluxo do jogo, incluindo:
+
+- Controle de turnos dos jogadores
+
+- Registro automático de transações (compra de propriedades, pagamento de aluguéis, etc.)
+
+- Atualização em tempo real do status do jogo
+
+**Registro e Acompanhamento do Histórico**
+
+Todas as ações dos jogadores são registradas, permitindo:
+
+- Análise detalhada da evolução de cada partida
+
+- Acesso rápido ao histórico de compras e movimentações no tabuleiro
+
+Este projeto representa uma solução integrada que combina bancos de dados NoSQL com desenvolvimento de APIs escaláveis, proporcionando um gerenciamento rápido, eficiente e automatizado das partidas de Monopoly.
