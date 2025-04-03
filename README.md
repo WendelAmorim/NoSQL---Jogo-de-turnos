@@ -14,7 +14,7 @@ O MongoDB é utilizado para armazenar dados de forma persistente e estruturada, 
 
 - Histórico completo das partidas
 
-**Otimização com Redis**
+**Otimização com Redis:**
 O Redis foi integrado para melhorar o desempenho e a eficiência do sistema, sendo usado para:
 
 - Cache de jogadores → evita consultas repetitivas ao MongoDB
@@ -25,14 +25,14 @@ O Redis foi integrado para melhorar o desempenho e a eficiência do sistema, sen
 
 - Controle de turnos utilizando chave-valor (SET/GET)
 
-**API com FastAPI, MongoDB e Redis**
+**API com FastAPI, MongoDB e Redis:**
 A API foi desenvolvida com FastAPI, permitindo a criação, atualização e consulta de partidas.
 
 - O MongoDB é acessado via Motor (AsyncIO) para operações assíncronas eficientes.
 
 - O Redis acelera operações frequentes, reduzindo a carga no banco de dados principal.
 
-**Gerenciamento Inteligente das Partidas**
+**Gerenciamento Inteligente das Partidas:**
 O sistema automatiza o fluxo do jogo, incluindo:
 
 - Controle de turnos dos jogadores
@@ -41,7 +41,7 @@ O sistema automatiza o fluxo do jogo, incluindo:
 
 - Atualização em tempo real do status do jogo
 
-**Registro e Acompanhamento do Histórico**
+**Registro e Acompanhamento do Histórico:**
 
 Todas as ações dos jogadores são registradas, permitindo:
 
