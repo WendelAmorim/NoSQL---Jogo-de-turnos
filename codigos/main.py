@@ -58,7 +58,6 @@ async def obter_jogador(jogador_id: str):
     if jogador:
         return {"jogador": jogador}
 
-    # Se não estiver no Redis, busca no MongoDB
     jogador = await db.jogadores.find_one({"nome": jogador_id})
     if jogador:
         await cache_jogador(jogador_id, Jogador(**jogador))
@@ -70,6 +69,7 @@ async def obter_jogador(jogador_id: str):
 @app.post("/comprar/{jogador_id}/{propriedade}")
 async def comprar_propriedade(jogador_id: str, propriedade: str):
     redis_client.lpush(f"compras:{jogador_id}", propriedade)
+    redis_client.pfadd("compradores_unicos", jogador_id)  # HyperLogLog para contar jogadores únicos
     return {"mensagem": f"{propriedade} comprada por {jogador_id}"}
 
 @app.get("/historico-compras/{jogador_id}")
@@ -77,10 +77,16 @@ async def historico_compras(jogador_id: str):
     compras = redis_client.lrange(f"compras:{jogador_id}", 0, -1)
     return {"compras": compras}
 
+@app.get("/total-jogadores-unicos")
+async def total_jogadores_unicos():
+    count = redis_client.pfcount("compradores_unicos")  # Contagem estimada de jogadores únicos
+    return {"total_jogadores_unicos": count}
+
 # 3. Conjunto de propriedades por jogador (SET)
 @app.post("/adicionar_propriedade/{jogador_id}/{propriedade}")
 async def adicionar_propriedade(jogador_id: str, propriedade: str):
     redis_client.sadd(f"propriedades:{jogador_id}", propriedade)
+    redis_client.bfadd("propriedades_existem", propriedade)  # Bloom Filter
     return {"mensagem": f"Propriedade {propriedade} adicionada ao jogador {jogador_id}"}
 
 @app.get("/propriedades/{jogador_id}")
@@ -97,6 +103,11 @@ async def verificar_conjunto(jogador_id: str, cor: str):
     possui_todas = all(prop in propriedades for prop in nomes_propriedades)
     
     return {"tem_conjunto": possui_todas}
+
+@app.get("/propriedade_existe/{propriedade}")
+async def propriedade_existe(propriedade: str):
+    existe = redis_client.bfexists("propriedades_existem", propriedade)  # Verifica Bloom Filter
+    return {"existe": bool(existe)}
 
 # 4. Gerenciamento de turnos no Redis
 @app.post("/set_turno/{jogador_id}")
