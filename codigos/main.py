@@ -13,8 +13,8 @@ DATABASE_NAME = "monopoly"
 client = AsyncIOMotorClient(MONGO_URI)
 db = client[DATABASE_NAME]
 
-# Conectar ao Redis
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+# Conectar ao Redis com namespace específico
+redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True, key_prefix='monopoly:')
 
 # Criar API FastAPI
 app = FastAPI(title="API Monopoly", description="API para gerenciamento de partidas e jogadores")
