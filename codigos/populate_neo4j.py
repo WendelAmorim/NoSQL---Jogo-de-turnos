@@ -13,8 +13,8 @@ def populate_board():
         tipo = item.get("tipo")
         endereco = item.get("endereco")
         
-        # Exemplo: utiliza _id como identificador único
-        # Atualize o query conforme os atributos que seu JSON possui:
+        # utiliza _id como identificador único
+        # Atualize o query conforme os atributos do json
         with neo4j_graph._driver.session() as session:
             session.write_transaction(
                 lambda tx, posicao_id=posicao_id, nome=nome, tipo=tipo, endereco=endereco: 
